@@ -110,7 +110,7 @@ class App extends Component {
   render() {
     return (
       <main className="container">
-        <h1 className="text-white text-uppercase text-center my-4">Todo App</h1>
+        <h1 className="text-white text-center my-4">To-Do-List</h1>
         <div className="row">
           <div className="col-md-6 col-sm-10 mx-auto p-0">
             <div className="card p-3">
