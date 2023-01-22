@@ -1,33 +1,7 @@
 import React, { Component } from 'react';
 import Modal from './components/Modal';
+import axios from 'axios';
 // import './App.css';
-
-const todoItems = [
-  {
-    id: 1,
-    title: "Test",
-    description: "Test",
-    completed: true,
-  },
-  {
-    id: 2,
-    title: "Test2",
-    description: "Test2",
-    completed: false,
-  },
-  {
-    id: 3,
-    title: "New Todo",
-    description: "✅ Blog Post\r\n✅ Edit Tutorial Video",
-    completed: true,
-  },
-  {
-    id: 4,
-    title: "Room",
-    description: "❌ clean the room",
-    completed: false,
-  },
-];
 
 
 class App extends Component {
@@ -35,23 +9,46 @@ class App extends Component {
     super(props);
     this.state = {
       viewCompleted: false,
-      todoList: todoItems,
+      todoList: [],
       modal: false,
       activeItem: {title: "", description: "", completed: false,},
     };
   }
 
+  componentDidMount() {
+    this.refreshList();
+  }
+
+  refreshList = () => {
+    axios
+      .get("/api/todos/")
+      .then((res) => this.setState({ todoList: res.data }))
+      .catch((err) => console.log(err));
+  };
+
   toggle = () => {
     this.setState({ modal: !this.state.modal});
   };
 
-  handelSubmit = (item) => {
+  handleSubmit = (item) => {
     this.toggle();
-    alert("save" + JSON.stringify(item));
-  };
 
-  handelDelete = (item) => {
-    alert("delete" + JSON.stringify(item));
+    if(item.id) {
+      axios
+        .put(`/api/todos/${item.id}/`, item)
+        .then((res) => this.refreshList());
+      return;
+    }
+    axios
+      .post("/api/todos/", item)
+      .then((res) => this.refreshList());
+  };
+  
+
+  handleDelete = (item) => {
+    axios
+      .delete(`/api/todos/${item.id}/`)
+      .then((res) => this.refreshList());
   };
 
   createItem = () => {
@@ -90,7 +87,7 @@ class App extends Component {
   renderItems = () => {
     const { viewCompleted } = this.state;
     const newItems = this.state.todoList.filter(
-      (item) => item.completed == viewCompleted
+      (item) => item.completed === viewCompleted
     );
 
     return newItems.map((item) => (
